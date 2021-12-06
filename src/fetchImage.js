@@ -13,7 +13,8 @@ const axios = require('axios').default;
     
   return  axios.get(url).then(response=>{
     this.incrementPage();
-    return  response.data})
+    return response.data
+  })
   }
 
   incrementPage() {

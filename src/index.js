@@ -2,33 +2,38 @@ import API  from './fetchImage';
 const axios = require('axios');
 import Notiflix from 'notiflix';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
-import templateList from './template.hbs';
+import imagesTpl from './template.hbs';
 import ApiServise from './fetchImage'
 
 const form = document.querySelector('#search-form')
 const searchBtn = document.querySelector("button");
 const input = document.querySelector("input");
+const gallery = document.querySelector('.gallery')
 const loadMoreBtn = document.querySelector('.load-more');
 const apiServise = new ApiServise();
-//let searchQuery = '';
 
 form.addEventListener('submit', onSubmit);
 loadMoreBtn.addEventListener('click', onLoadMore)
 
-
 function onSubmit(e) {
+  clearImgContainer();
   e.preventDefault();
   apiServise.query = e.currentTarget.elements.searchQuery.value.trim();
-  apiServise.fetchImage().then(renderUserListItems).catch((error) => { return Notify.failure("Sorry, there are no images matching your search query. Please try again.")});
+  apiServise.resetPage();
+  apiServise.fetchImage().then(renderItems).catch((error) => { return Notify.failure("Sorry, there are no images matching your search query. Please try again.")});
     };
-
-
-function renderUserListItems(cards) {
-   const markup = templateList.join("");
-  userList.innerHTML = markup;
-};
 
 function onLoadMore(e) {
   e.preventDefault();
-  apiServise.fetchImage().then(renderUserListItems).catch((error) => { return Notify.failure("Sorry, there are no images matching your search query. Please try again.")});
- }
+  apiServise.fetchImage().then(renderItems).catch((error) => { return Notify.failure("Sorry, there are no images matching your search query. Please try again.")});
+};
+
+function renderItems(data) {
+  gallery.insertAdjacentHTML('beforeend', imagesTpl(data.hits));
+  Notify.success(`Hooray! We found ${data.totalHits} images.`)
+    lightboxGallery()
+};
+
+function clearImgContainer() {
+  gallery.innerHTML = '';
+};
